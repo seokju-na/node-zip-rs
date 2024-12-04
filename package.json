@@ -1,0 +1,43 @@
+{
+  "name": "zip-rs",
+  "version": "0.0.0",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "napi": {
+    "name": "zip-rs",
+    "triples": {
+      "defaults": false,
+      "additional": [
+        "aarch64-apple-darwin",
+        "aarch64-pc-windows-msvc",
+        "x86_64-apple-darwin",
+        "x86_64-pc-windows-msvc",
+        "i686-pc-windows-msvc",
+        "universal-apple-darwin"
+      ]
+    }
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@napi-rs/cli": "^2.18.4",
+    "@types/node": "^22.10.1",
+    "@types/yauzl-promise": "^4",
+    "vitest": "^2.1.8",
+    "yauzl-promise": "^4.0.0"
+  },
+  "engines": {
+    "node": ">= 10"
+  },
+  "scripts": {
+    "artifacts": "napi artifacts",
+    "build": "napi build --platform --release",
+    "build:debug": "napi build --platform",
+    "prepublishOnly": "napi prepublish -t npm",
+    "test": "vitest run",
+    "bench": "vitest bench --run",
+    "check": "biome check",
+    "check:fix": "biome check --write --unsafe"
+  },
+  "packageManager": "yarn@4.5.3"
+}
