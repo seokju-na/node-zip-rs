@@ -181,7 +181,7 @@ jobs:
           name: bindings-aarch64-apple-darwin
           path: artifacts
       - name: Combine binaries
-        run: yarn universal
+        run: yarn napi universal
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
@@ -210,7 +210,7 @@ jobs:
       - name: Create npm directory
         run: yarn napi create-npm-dir -t .
       - name: Move artifacts
-        run: yarn artifacts
+        run: yarn napi artifacts
       - name: List packages
         run: ls -R ./npm
         shell: bash
