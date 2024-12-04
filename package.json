@@ -1,8 +1,24 @@
 {
   "name": "zip-rs",
-  "version": "0.0.1",
+  "version": "0.0.2",
+  "description": "Zip library for Node.js with Rust binding",
   "main": "index.js",
   "types": "index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/seokju-na/node-zip-rs.git"
+  },
+  "keywords": [
+    "napi-rs",
+    "zip",
+    "archive",
+    "unzip"
+  ],
+  "homepage": "https://github.com/seokju-na/node-zip-rs",
+  "author": "Seokju Na <seokju.me@gmail.com>",
+  "bugs": {
+    "url": "https://github.com/seokju-na/node-zip-rs/issues"
+  },
   "napi": {
     "name": "zip-rs",
     "triples": {
