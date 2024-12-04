@@ -1,6 +1,6 @@
 {
   "name": "zip-rs",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Zip library for Node.js with Rust binding",
   "main": "index.js",
   "types": "index.d.ts",
@@ -42,16 +42,23 @@
     "vitest": "^2.1.8",
     "yauzl-promise": "^4.0.0"
   },
+  "files": [
+    "index.js",
+    "index.d.ts"
+  ],
   "engines": {
     "node": ">= 10"
   },
   "scripts": {
+    "artifacts": "napi artifacts",
     "build": "napi build --platform --release",
     "build:debug": "napi build --platform",
+    "prepublishOnly": "napi prepublish -t npm",
     "test": "vitest run",
     "bench": "vitest bench --run",
     "check": "biome check",
-    "check:fix": "biome check --write --unsafe"
+    "check:fix": "biome check --write --unsafe",
+    "version": "napi version"
   },
   "packageManager": "yarn@4.5.3"
 }
