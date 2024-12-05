@@ -1,7 +1,7 @@
 # node-zip-rs
 
 ```shell
-$ yarn add zip-rs
+$ yarn add node-zip-rs
 ```
 
 ## API

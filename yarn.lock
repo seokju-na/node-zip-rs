@@ -1596,6 +1596,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"node-zip-rs@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "node-zip-rs@workspace:."
+  dependencies:
+    "@biomejs/biome": "npm:^1.9.4"
+    "@napi-rs/cli": "npm:^2.18.4"
+    "@types/node": "npm:^22.10.1"
+    "@types/yauzl-promise": "npm:^4"
+    vitest: "npm:^2.1.8"
+    yauzl-promise: "npm:^4.0.0"
+  languageName: unknown
+  linkType: soft
+
 "nopt@npm:^7.0.0":
   version: 7.2.1
   resolution: "nopt@npm:7.2.1"
@@ -2213,16 +2226,3 @@ __metadata:
   checksum: 10c0/105c397c5dd96b3dccd567f70d3f2694f35790157b1f9977ac9e343f6f953850dcc5a1d25c11dbf45d38a263db7f18715e8065e0a04df11065cb1eb48665eced
   languageName: node
   linkType: hard
-
-"zip-rs@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "zip-rs@workspace:."
-  dependencies:
-    "@biomejs/biome": "npm:^1.9.4"
-    "@napi-rs/cli": "npm:^2.18.4"
-    "@types/node": "npm:^22.10.1"
-    "@types/yauzl-promise": "npm:^4"
-    vitest: "npm:^2.1.8"
-    yauzl-promise: "npm:^4.0.0"
-  languageName: unknown
-  linkType: soft

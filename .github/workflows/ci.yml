@@ -1,7 +1,7 @@
 name: ci
 env:
   DEBUG: napi:*
-  APP_NAME: zip-rs
+  APP_NAME: node-zip-rs
   MACOSX_DEPLOYMENT_TARGET: '10.13'
 permissions:
   contents: write
@@ -53,9 +53,9 @@ jobs:
           - host: macos-latest
             target: aarch64-apple-darwin
             build: yarn build --target aarch64-apple-darwin
-#          - host: windows-latest
-#            target: aarch64-pc-windows-msvc
-#            build: yarn build --target aarch64-pc-windows-msvc
+          - host: windows-latest
+            target: aarch64-pc-windows-msvc
+            build: yarn build --target aarch64-pc-windows-msvc
     name: stable - ${{ matrix.settings.target }} - node@20
     runs-on: ${{ matrix.settings.host }}
     steps:

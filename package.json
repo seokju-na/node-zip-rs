@@ -1,6 +1,6 @@
 {
-  "name": "zip-rs",
-  "version": "0.0.4",
+  "name": "node-zip-rs",
+  "version": "0.0.5",
   "description": "Zip library for Node.js with Rust binding",
   "main": "index.js",
   "types": "index.d.ts",
@@ -20,11 +20,12 @@
     "url": "https://github.com/seokju-na/node-zip-rs/issues"
   },
   "napi": {
-    "name": "zip-rs",
+    "name": "node-zip-rs",
     "triples": {
       "defaults": false,
       "additional": [
         "aarch64-apple-darwin",
+        "aarch64-pc-windows-msvc",
         "x86_64-apple-darwin",
         "x86_64-pc-windows-msvc",
         "i686-pc-windows-msvc",

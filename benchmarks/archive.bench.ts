@@ -33,7 +33,7 @@ describe('readFileAsync', () => {
     }
   });
 
-  bench('zip-rs', async () => {
+  bench('node-zip-rs', async () => {
     const zip = await zipRs.openArchiveAsync(filepath);
     for (const file of zip.fileNames()) {
       await zip.readFileAsync(file);
