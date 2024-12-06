@@ -1,13 +1,13 @@
 use napi::bindgen_prelude::*;
 use napi_derive::napi;
 use std::fs;
-use std::io::Read;
+use std::io::{Cursor, Read};
 use std::path::Path;
 use std::sync::RwLock;
 
 #[napi]
 pub struct Archive {
-  pub(crate) inner: zip::ZipArchive<fs::File>,
+  pub(crate) inner: zip::ZipArchive<Cursor<Vec<u8>>>,
 }
 
 pub struct ExtractTask {
@@ -71,6 +71,13 @@ impl Task for ReadFileTask {
 
 #[napi]
 impl Archive {
+  #[napi(factory)]
+  pub fn from_buffer(buffer: Buffer) -> crate::Result<Self> {
+    let data: Vec<u8> = buffer.into();
+    let inner = zip::ZipArchive::new(Cursor::new(data))?;
+    Ok(Self { inner })
+  }
+
   #[napi]
   pub fn is_empty(&self) -> bool {
     self.inner.is_empty()
@@ -126,12 +133,18 @@ impl Archive {
   }
 
   #[napi]
-  pub fn file_names(&self) -> Vec<String> {
-    self
-      .inner
-      .file_names()
-      .map(|x| x.to_string())
-      .collect::<Vec<_>>()
+  pub fn file_names(&mut self) -> crate::Result<Vec<String>> {
+    let mut file_names: Vec<String> = vec![];
+    for i in 0..self.inner.len() {
+      let file = self.inner.by_index(i)?;
+      if file.is_file() {
+        if let Some(path_buf) = file.enclosed_name() {
+          let file_name = path_buf.to_string_lossy().to_string();
+          file_names.push(file_name);
+        }
+      }
+    }
+    Ok(file_names)
   }
 }
 
@@ -146,8 +159,10 @@ impl Task for OpenArchiveTask {
 
   fn compute(&mut self) -> Result<Self::Output> {
     let filepath = Path::new(&self.path);
-    let file = fs::File::open(filepath)?;
-    let inner = zip::ZipArchive::new(file).map_err(crate::Error::from)?;
+    let mut file = fs::File::open(filepath)?;
+    let mut data = vec![];
+    file.read_to_end(&mut data)?;
+    let inner = zip::ZipArchive::new(Cursor::new(data)).map_err(crate::Error::from)?;
     Ok(Archive { inner })
   }
 
@@ -159,8 +174,10 @@ impl Task for OpenArchiveTask {
 #[napi]
 pub fn open_archive(path: String) -> crate::Result<Archive> {
   let filepath = Path::new(&path);
-  let file = fs::File::open(filepath)?;
-  let inner = zip::ZipArchive::new(file)?;
+  let mut file = fs::File::open(filepath)?;
+  let mut data = vec![];
+  file.read_to_end(&mut data)?;
+  let inner = zip::ZipArchive::new(Cursor::new(data)).map_err(crate::Error::from)?;
   Ok(Archive { inner })
 }
 

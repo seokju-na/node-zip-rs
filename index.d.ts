@@ -24,6 +24,7 @@ export interface WriteFileOptions {
 export declare function write(srcDir: string, dst: string, options?: WriteFileOptions | undefined | null): void
 export declare function writeAsync(srcDir: string, dst: string, options?: WriteFileOptions | undefined | null, signal?: AbortSignal | undefined | null): Promise<void>
 export declare class Archive {
+  static fromBuffer(buffer: Buffer): Archive
   isEmpty(): boolean
   readFile(name: string): Buffer
   readFileAsync(name: string, signal?: AbortSignal | undefined | null): Promise<Buffer>
