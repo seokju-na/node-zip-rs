@@ -37,6 +37,25 @@ export declare class Archive {
 }
 ```
 
+## Benchmark
+
+```
+ RUN  v2.1.8 /Users/seokju.me/workspace/node-rs-zip
+
+ ✓ benchmarks/archive.bench.ts (2) 1224ms
+   ✓ readFileAsync (2) 1222ms
+     name              hz     min      max     mean      p75      p99     p995     p999     rme  samples
+   · yauzl        89.5126  9.9123  13.7344  11.1716  11.5436  13.7344  13.7344  13.7344  ±2.52%       45
+   · node-zip-rs   170.79  5.4248  13.6432   5.8551   5.7539  13.6432  13.6432  13.6432  ±4.23%       86   fastest
+
+ BENCH  Summary
+
+  node-zip-rs - benchmarks/archive.bench.ts > readFileAsync
+    1.91x faster than yauzl
+```
+
+Tested with MacBook Pro 16 (M1 Max, 2021).
+
 ## License
 
 MIT License
