@@ -1,6 +1,6 @@
 {
   "name": "node-zip-rs",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Zip library for Node.js with Rust binding",
   "main": "index.js",
   "types": "index.d.ts",
