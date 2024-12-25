@@ -2,7 +2,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { bench, describe } from 'vitest';
 import yauzl from 'yauzl-promise';
-import zipRs from '../';
+import { openZipArchiveAsync } from '../';
 
 const dirname = path.basename(fileURLToPath(import.meta.url));
 const filepath = path.join(dirname, '..', 'tests', 'fixtures', 'nextjs.zip');
@@ -34,7 +34,7 @@ describe('readFileAsync', () => {
   });
 
   bench('node-zip-rs', async () => {
-    const zip = await zipRs.openArchiveAsync(filepath);
+    const zip = await openZipArchiveAsync(filepath);
     for (const file of zip.fileNames()) {
       await zip.readFileAsync(file);
     }

@@ -310,11 +310,12 @@ if (!nativeBinding) {
   throw new Error(`Failed to load native binding`)
 }
 
-const { Archive, openArchive, openArchiveAsync, CompressionMethod, write, writeAsync } = nativeBinding
+const { ZipArchive, openZipArchive, openZipArchiveAsync, ZipWriter, CompressionMethod, writeZip, writeZipAsync } = nativeBinding
 
-module.exports.Archive = Archive
-module.exports.openArchive = openArchive
-module.exports.openArchiveAsync = openArchiveAsync
+module.exports.ZipArchive = ZipArchive
+module.exports.openZipArchive = openZipArchive
+module.exports.openZipArchiveAsync = openZipArchiveAsync
+module.exports.ZipWriter = ZipWriter
 module.exports.CompressionMethod = CompressionMethod
-module.exports.write = write
-module.exports.writeAsync = writeAsync
+module.exports.writeZip = writeZip
+module.exports.writeZipAsync = writeZipAsync

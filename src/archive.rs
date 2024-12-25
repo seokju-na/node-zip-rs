@@ -6,12 +6,12 @@ use std::path::Path;
 use std::sync::RwLock;
 
 #[napi]
-pub struct Archive {
+pub struct ZipArchive {
   pub(crate) inner: zip::ZipArchive<Cursor<Vec<u8>>>,
 }
 
 pub struct ExtractTask {
-  archive: RwLock<Reference<Archive>>,
+  archive: RwLock<Reference<ZipArchive>>,
   outdir: String,
 }
 
@@ -38,7 +38,7 @@ impl Task for ExtractTask {
 }
 
 pub struct ReadFileTask {
-  archive: RwLock<Reference<Archive>>,
+  archive: RwLock<Reference<ZipArchive>>,
   name: String,
 }
 
@@ -70,7 +70,7 @@ impl Task for ReadFileTask {
 }
 
 #[napi]
-impl Archive {
+impl ZipArchive {
   #[napi(factory)]
   pub fn from_buffer(buffer: Buffer) -> crate::Result<Self> {
     let data: Vec<u8> = buffer.into();
@@ -97,7 +97,7 @@ impl Archive {
   #[napi]
   pub fn read_file_async(
     &self,
-    self_ref: Reference<Archive>,
+    self_ref: Reference<ZipArchive>,
     name: String,
     signal: Option<AbortSignal>,
   ) -> AsyncTask<ReadFileTask> {
@@ -119,7 +119,7 @@ impl Archive {
   #[napi]
   pub fn extract_async(
     &self,
-    self_ref: Reference<Archive>,
+    self_ref: Reference<ZipArchive>,
     outdir: String,
     signal: Option<AbortSignal>,
   ) -> AsyncTask<ExtractTask> {
@@ -154,8 +154,8 @@ pub struct OpenArchiveTask {
 
 #[napi]
 impl Task for OpenArchiveTask {
-  type Output = Archive;
-  type JsValue = Archive;
+  type Output = ZipArchive;
+  type JsValue = ZipArchive;
 
   fn compute(&mut self) -> Result<Self::Output> {
     let filepath = Path::new(&self.path);
@@ -163,7 +163,7 @@ impl Task for OpenArchiveTask {
     let mut data = vec![];
     file.read_to_end(&mut data)?;
     let inner = zip::ZipArchive::new(Cursor::new(data)).map_err(crate::Error::from)?;
-    Ok(Archive { inner })
+    Ok(ZipArchive { inner })
   }
 
   fn resolve(&mut self, _env: Env, output: Self::Output) -> Result<Self::JsValue> {
@@ -172,16 +172,16 @@ impl Task for OpenArchiveTask {
 }
 
 #[napi]
-pub fn open_archive(path: String) -> crate::Result<Archive> {
+pub fn open_zip_archive(path: String) -> crate::Result<ZipArchive> {
   let filepath = Path::new(&path);
   let mut file = fs::File::open(filepath)?;
   let mut data = vec![];
   file.read_to_end(&mut data)?;
   let inner = zip::ZipArchive::new(Cursor::new(data)).map_err(crate::Error::from)?;
-  Ok(Archive { inner })
+  Ok(ZipArchive { inner })
 }
 
 #[napi]
-pub fn open_archive_async(path: String, signal: Option<AbortSignal>) -> AsyncTask<OpenArchiveTask> {
+pub fn open_zip_archive_async(path: String, signal: Option<AbortSignal>) -> AsyncTask<OpenArchiveTask> {
   AsyncTask::with_optional_signal(OpenArchiveTask { path }, signal)
 }
