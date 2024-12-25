@@ -7,8 +7,8 @@ $ yarn add node-zip-rs
 ## API
 
 ```ts
-export declare function openArchive(path: string): Archive
-export declare function openArchiveAsync(path: string, signal?: AbortSignal | undefined | null): Promise<Archive>
+export declare function openZipArchive(path: string): ZipArchive
+export declare function openZipArchiveAsync(path: string, signal?: AbortSignal | undefined | null): Promise<ZipArchive>
 export const enum CompressionMethod {
   Stored = 0,
   Deflated = 1,
@@ -25,15 +25,22 @@ export interface WriteFileOptions {
   permissions?: number
   largeFile?: boolean
 }
-export declare function write(srcDir: string, dst: string, options?: WriteFileOptions | undefined | null): void
-export declare function writeAsync(srcDir: string, dst: string, options?: WriteFileOptions | undefined | null, signal?: AbortSignal | undefined | null): Promise<void>
-export declare class Archive {
+export declare function writeZip(srcDir: string, dst: string, options?: WriteFileOptions | undefined | null): void
+export declare function writeZipAsync(srcDir: string, dst: string, options?: WriteFileOptions | undefined | null, signal?: AbortSignal | undefined | null): Promise<void>
+export declare class ZipArchive {
+  static fromBuffer(buffer: Buffer): ZipArchive
   isEmpty(): boolean
   readFile(name: string): Buffer
   readFileAsync(name: string, signal?: AbortSignal | undefined | null): Promise<Buffer>
   extract(outdir: string): void
   extractAsync(outdir: string, signal?: AbortSignal | undefined | null): Promise<void>
   fileNames(): Array<string>
+}
+export declare class ZipWriter {
+  constructor()
+  writeFile(filepath: string, realpath?: string | undefined | null, options?: WriteFileOptions | undefined | null): void
+  finish(dst: string): void
+  finishToBuffer(): Buffer
 }
 ```
 

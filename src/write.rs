@@ -5,6 +5,57 @@ use std::path::Path;
 use std::{fs, io};
 
 #[napi]
+pub struct ZipWriter {
+  pub(crate) inner: zip::ZipWriter<io::Cursor<Vec<u8>>>,
+}
+
+#[napi]
+impl ZipWriter {
+  #[napi(constructor)]
+  #[allow(clippy::new_without_default)]
+  pub fn new() -> Self {
+    let inner = zip::ZipWriter::new(io::Cursor::default());
+    Self { inner }
+  }
+
+  #[napi]
+  pub fn write_file(
+    &mut self,
+    filepath: String,
+    realpath: Option<String>,
+    options: Option<WriteFileOptions>,
+  ) -> crate::Result<()> {
+    let realpath = realpath.to_owned().unwrap_or(filepath.to_owned());
+    let path = Path::new(&realpath);
+    let mut file = fs::File::open(path)?;
+    let options = options
+      .map(zip::write::SimpleFileOptions::from)
+      .unwrap_or_default();
+    self.inner.start_file(&filepath, options)?;
+    io::copy(&mut file, &mut self.inner)?;
+    Ok(())
+  }
+
+  #[napi]
+  pub fn finish(&mut self, dst: String) -> crate::Result<()> {
+    let mut file = fs::File::create(dst)?;
+    let mut zip = zip::ZipWriter::new(io::Cursor::default());
+    std::mem::swap(&mut zip, &mut self.inner);
+    let data = zip.finish()?;
+    file.write_all(data.get_ref())?;
+    Ok(())
+  }
+
+  #[napi]
+  pub fn finish_to_buffer(&mut self) -> crate::Result<Buffer> {
+    let mut zip = zip::ZipWriter::new(io::Cursor::default());
+    std::mem::swap(&mut zip, &mut self.inner);
+    let data = zip.finish()?;
+    Ok(Buffer::from(data.into_inner()))
+  }
+}
+
+#[napi]
 pub enum CompressionMethod {
   Stored,
   Deflated,
@@ -128,7 +179,7 @@ impl Task for WriteTask {
 }
 
 #[napi]
-pub fn write(src_dir: String, dst: String, options: Option<WriteFileOptions>) -> crate::Result<()> {
+pub fn write_zip(src_dir: String, dst: String, options: Option<WriteFileOptions>) -> crate::Result<()> {
   let src_path = Path::new(&src_dir);
   if !src_path.is_dir() {
     return Err(zip::result::ZipError::FileNotFound.into());
@@ -145,7 +196,7 @@ pub fn write(src_dir: String, dst: String, options: Option<WriteFileOptions>) ->
 }
 
 #[napi]
-pub fn write_async(
+pub fn write_zip_async(
   src_dir: String,
   dst: String,
   options: Option<WriteFileOptions>,
