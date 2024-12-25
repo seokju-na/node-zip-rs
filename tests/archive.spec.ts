@@ -9,7 +9,6 @@ test('archive from buffer', async () => {
   const filepath = path.join(ROOT_DIR, 'tests', 'fixtures', 'simple.zip');
   const buffer = await fs.readFile(filepath);
   const archive = ZipArchive.fromBuffer(buffer);
-  console.log(archive.fileNames());
   await expect(archive.readFileAsync('index.js')).resolves.toEqual(Buffer.from("console.log('Hello World');", 'utf8'));
 });
 
