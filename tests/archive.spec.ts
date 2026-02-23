@@ -17,6 +17,9 @@ test('fileNames', async () => {
   const archive = await openZipArchiveAsync(filepath);
   const fileNames = archive.fileNames();
   expect(fileNames).not.toContain('_next/static/css/');
+  if (process.platform === 'win32') {
+    console.log(fileNames);
+  }
   expect(fileNames).toContain('_next/static/css/6fce7568a752b0cf.css');
 });
 
