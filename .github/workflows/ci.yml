@@ -199,7 +199,7 @@ jobs:
         with:
           path: artifacts
       - name: Create npm directory
-        run: yarn napi create-npm-dirs -t .
+        run: yarn napi create-npm-dirs
       - name: Move artifacts
         run: yarn napi artifacts
       - name: List packages
