@@ -20,28 +20,25 @@
     "url": "https://github.com/seokju-na/node-zip-rs/issues"
   },
   "napi": {
-    "name": "node-zip-rs",
-    "triples": {
-      "defaults": false,
-      "additional": [
-        "aarch64-apple-darwin",
-        "aarch64-pc-windows-msvc",
-        "x86_64-apple-darwin",
-        "x86_64-pc-windows-msvc",
-        "i686-pc-windows-msvc",
-        "universal-apple-darwin",
-        "x86_64-unknown-linux-gnu",
-        "x86_64-unknown-linux-musl"
-      ]
-    }
+    "binaryName": "node-zip-rs",
+    "targets": [
+      "x86_64-apple-darwin",
+      "aarch64-apple-darwin",
+      "aarch64-pc-windows-msvc",
+      "x86_64-pc-windows-msvc",
+      "i686-pc-windows-msvc",
+      "x86_64-unknown-linux-gnu",
+      "x86_64-unknown-linux-musl"
+    ]
   },
   "license": "MIT",
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
-    "@napi-rs/cli": "^2.18.4",
-    "@types/node": "^22.10.1",
+    "@napi-rs/cli": "3.5.1",
+    "@types/node": "^22.12.0",
     "@types/yauzl-promise": "^4",
-    "vitest": "^2.1.8",
+    "typescript": "5.9.3",
+    "vitest": "^4.0.18",
     "yauzl-promise": "^4.0.0"
   },
   "files": [
@@ -53,14 +50,14 @@
   },
   "scripts": {
     "artifacts": "napi artifacts",
-    "build": "napi build --platform --release",
-    "build:debug": "napi build --platform",
-    "prepublishOnly": "napi prepublish -t npm",
+    "build": "napi build --platform --release --no-const-enum",
+    "build:debug": "napi build --platform --no-const-enum",
+    "prepublishOnly": "napi pre-publish",
     "test": "vitest run",
     "bench": "vitest bench --run",
     "check": "biome check",
     "check:fix": "biome check --write --unsafe",
     "version": "napi version"
   },
-  "packageManager": "yarn@4.5.3"
+  "packageManager": "yarn@4.12.0"
 }

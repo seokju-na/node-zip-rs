@@ -3,15 +3,15 @@ use napi_derive::napi;
 use std::fs;
 use std::io::{Cursor, Read};
 use std::path::Path;
-use std::sync::RwLock;
+use std::sync::{Arc, Mutex};
 
 #[napi]
 pub struct ZipArchive {
-  pub(crate) inner: zip::ZipArchive<Cursor<Vec<u8>>>,
+  pub(crate) inner: Arc<Mutex<zip::ZipArchive<Cursor<Vec<u8>>>>>,
 }
 
 pub struct ExtractTask {
-  archive: RwLock<Reference<ZipArchive>>,
+  archive: Arc<Mutex<zip::ZipArchive<Cursor<Vec<u8>>>>>,
   outdir: String,
 }
 
@@ -23,10 +23,9 @@ impl Task for ExtractTask {
   fn compute(&mut self) -> Result<Self::Output> {
     let mut archive = self
       .archive
-      .write()
+      .lock()
       .map_err(|e| Error::new(Status::GenericFailure, format!("{e}")))?;
     archive
-      .inner
       .extract(&self.outdir)
       .map_err(crate::Error::from)?;
     Ok(())
@@ -38,7 +37,7 @@ impl Task for ExtractTask {
 }
 
 pub struct ReadFileTask {
-  archive: RwLock<Reference<ZipArchive>>,
+  archive: Arc<Mutex<zip::ZipArchive<Cursor<Vec<u8>>>>>,
   name: String,
 }
 
@@ -50,10 +49,9 @@ impl Task for ReadFileTask {
   fn compute(&mut self) -> Result<Self::Output> {
     let mut archive = self
       .archive
-      .write()
+      .lock()
       .map_err(|e| Error::new(Status::GenericFailure, format!("{e}")))?;
     let mut file = archive
-      .inner
       .by_name(&self.name)
       .map_err(crate::Error::from)?;
     if !file.is_file() {
@@ -75,17 +73,24 @@ impl ZipArchive {
   pub fn from_buffer(buffer: Buffer) -> crate::Result<Self> {
     let data: Vec<u8> = buffer.into();
     let inner = zip::ZipArchive::new(Cursor::new(data))?;
-    Ok(Self { inner })
+    Ok(Self {
+      inner: Arc::new(Mutex::new(inner)),
+    })
   }
 
   #[napi]
   pub fn is_empty(&self) -> bool {
-    self.inner.is_empty()
+    let archive = self.inner.lock().unwrap_or_else(|e| e.into_inner());
+    archive.is_empty()
   }
 
   #[napi]
   pub fn read_file(&mut self, name: String) -> crate::Result<Buffer> {
-    let mut file = self.inner.by_name(&name)?;
+    let mut archive = self
+      .inner
+      .lock()
+      .map_err(|e| Error::new(Status::GenericFailure, format!("{e}")))?;
+    let mut file = archive.by_name(&name)?;
     if !file.is_file() {
       return Err(zip::result::ZipError::FileNotFound.into());
     }
@@ -97,13 +102,13 @@ impl ZipArchive {
   #[napi]
   pub fn read_file_async(
     &self,
-    self_ref: Reference<ZipArchive>,
+    _self_ref: Reference<ZipArchive>,
     name: String,
     signal: Option<AbortSignal>,
   ) -> AsyncTask<ReadFileTask> {
     AsyncTask::with_optional_signal(
       ReadFileTask {
-        archive: RwLock::new(self_ref),
+        archive: self.inner.clone(),
         name,
       },
       signal,
@@ -112,20 +117,24 @@ impl ZipArchive {
 
   #[napi]
   pub fn extract(&mut self, outdir: String) -> crate::Result<()> {
-    self.inner.extract(&outdir)?;
+    let mut archive = self
+      .inner
+      .lock()
+      .map_err(|e| Error::new(Status::GenericFailure, format!("{e}")))?;
+    archive.extract(&outdir)?;
     Ok(())
   }
 
   #[napi]
   pub fn extract_async(
     &self,
-    self_ref: Reference<ZipArchive>,
+    _self_ref: Reference<ZipArchive>,
     outdir: String,
     signal: Option<AbortSignal>,
   ) -> AsyncTask<ExtractTask> {
     AsyncTask::with_optional_signal(
       ExtractTask {
-        archive: RwLock::new(self_ref),
+        archive: self.inner.clone(),
         outdir,
       },
       signal,
@@ -135,8 +144,12 @@ impl ZipArchive {
   #[napi]
   pub fn file_names(&mut self) -> crate::Result<Vec<String>> {
     let mut file_names: Vec<String> = vec![];
-    for i in 0..self.inner.len() {
-      let file = self.inner.by_index(i)?;
+    let mut archive = self
+      .inner
+      .lock()
+      .map_err(|e| Error::new(Status::GenericFailure, format!("{e}")))?;
+    for i in 0..archive.len() {
+      let file = archive.by_index(i)?;
       if file.is_file() {
         if let Some(path_buf) = file.enclosed_name() {
           let file_name = path_buf.to_string_lossy().to_string();
@@ -163,7 +176,9 @@ impl Task for OpenArchiveTask {
     let mut data = vec![];
     file.read_to_end(&mut data)?;
     let inner = zip::ZipArchive::new(Cursor::new(data)).map_err(crate::Error::from)?;
-    Ok(ZipArchive { inner })
+    Ok(ZipArchive {
+      inner: Arc::new(Mutex::new(inner)),
+    })
   }
 
   fn resolve(&mut self, _env: Env, output: Self::Output) -> Result<Self::JsValue> {
@@ -178,7 +193,9 @@ pub fn open_zip_archive(path: String) -> crate::Result<ZipArchive> {
   let mut data = vec![];
   file.read_to_end(&mut data)?;
   let inner = zip::ZipArchive::new(Cursor::new(data)).map_err(crate::Error::from)?;
-  Ok(ZipArchive { inner })
+  Ok(ZipArchive {
+    inner: Arc::new(Mutex::new(inner)),
+  })
 }
 
 #[napi]

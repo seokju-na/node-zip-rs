@@ -55,7 +55,8 @@ impl ZipWriter {
   }
 }
 
-#[napi]
+#[napi(string_enum="lowercase")]
+#[derive(Clone, Copy)]
 pub enum CompressionMethod {
   Stored,
   Deflated,
