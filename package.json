@@ -50,8 +50,8 @@
   },
   "scripts": {
     "artifacts": "napi artifacts",
-    "build": "napi build --platform --release --no-const-enum",
-    "build:debug": "napi build --platform --no-const-enum",
+    "build": "napi build --platform --release --no-const-enum --no-dts-cache",
+    "build:debug": "napi build --platform --no-const-enum --no-dts-cache",
     "prepublishOnly": "napi pre-publish",
     "test": "vitest run",
     "bench": "vitest bench --run",

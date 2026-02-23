@@ -45,11 +45,11 @@ jobs:
             target: aarch64-apple-darwin
             build: yarn build --target aarch64-apple-darwin
           - host: windows-latest
-            build: yarn build --target x86_64-pc-windows-msvc
             target: x86_64-pc-windows-msvc
+            build: yarn build --target x86_64-pc-windows-msvc
           - host: windows-latest
-            build: yarn build --target i686-pc-windows-msvc
             target: i686-pc-windows-msvc
+            build: yarn build --target i686-pc-windows-msvc
           - host: windows-latest
             target: aarch64-pc-windows-msvc
             build: yarn build --target aarch64-pc-windows-msvc
@@ -59,7 +59,7 @@ jobs:
           - host: ubuntu-latest
             target: x86_64-unknown-linux-musl
             build: yarn build --target x86_64-unknown-linux-musl -x
-    name: stable - ${{ matrix.settings.target }} - node@22
+    name: build-${{ matrix.settings.target }}
     runs-on: ${{ matrix.settings.host }}
     steps:
       - uses: actions/checkout@v4
@@ -68,10 +68,10 @@ jobs:
         with:
           node-version: 22.20.0
           cache: yarn
-      - name: Install
-        uses: dtolnay/rust-toolchain@stable
+      - name: Setup rust
+        uses: dtolnay/rust-toolchain@4be9e76fd7c4901c61fb841f559994984270fce7 # stable
         with:
-          toolchain: stable
+          toolchain: 1.91.0
           targets: ${{ matrix.settings.target }}
       - name: Cache cargo
         uses: actions/cache@v4
@@ -107,7 +107,7 @@ jobs:
           path: ${{ env.APP_NAME }}.*.node
           if-no-files-found: error
   test-x64:
-    name: Test x64 bindings on ${{ matrix.settings.target }} - node@${{ matrix.node }}
+    name: test-x64-node@${{ matrix.node }} (${{ matrix.settings.target }})
     needs:
       - build
     strategy:
@@ -144,7 +144,7 @@ jobs:
       - name: Test bindings
         run: yarn test
   test-aarch64:
-    name: Test aarch64 bindings on ${{ matrix.settings.target }} - node@${{ matrix.node }}
+    name: test-aarch64-node@${{ matrix.node }} (${{ matrix.settings.target }})
     needs:
       - build
     strategy:
@@ -185,6 +185,7 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - test-x64
+      - test-aarch64
     steps:
       - uses: actions/checkout@v4
       - name: Setup node
