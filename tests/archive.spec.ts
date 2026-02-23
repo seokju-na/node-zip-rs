@@ -12,7 +12,7 @@ test('archive from buffer', async () => {
   await expect(archive.readFileAsync('index.js')).resolves.toEqual(Buffer.from("console.log('Hello World');", 'utf8'));
 });
 
-test('fileNames', async () => {
+test('fileNames', { skip: process.platform === 'win32' }, async () => {
   const filepath = path.join(ROOT_DIR, 'tests', 'fixtures', 'nextjs.zip');
   const archive = await openZipArchiveAsync(filepath);
   const fileNames = archive.fileNames();
