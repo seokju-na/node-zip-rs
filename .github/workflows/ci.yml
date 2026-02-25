@@ -207,17 +207,16 @@ jobs:
         shell: bash
       - name: Publish
         run: |
-          npm config set provenance true
+          set -ex
           if git log -1 --pretty=%B | grep "^[0-9]\+\.[0-9]\+\.[0-9]\+$";
           then
-            echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
-            npm publish --access public
+            yarn napi prepublish -t npm
+            npm publish --provenance --access public
           elif git log -1 --pretty=%B | grep "^[0-9]\+\.[0-9]\+\.[0-9]\+";
           then
-            echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
-            npm publish --tag next --access public
+            npm config set tag next
+            yarn napi prepublish -t npm --no-gh-release
+            npm publish --provenance --tag next --access public
           else
             echo "Not a release, skipping publish"
           fi
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
