@@ -220,3 +220,6 @@ jobs:
           else
             echo "Not a release, skipping publish"
           fi
+        env:
+          NPM_CONFIG_PROVENANCE: true
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
